@@ -1,8 +1,8 @@
 import { Get, Post, Res, Body, Controller, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { AlgoritmoService } from './algoritmo.service';
 import { ExpressAdapter, FileInterceptor } from '@nestjs/platform-express';
-import { createReadStream, readFile, readFileSync} from 'fs';
-import { join } from 'path';
+import { createReadStream, readFile, readFileSync, writeFile, writeFileSync} from 'fs';
+import { File } from 'buffer';
 
 @Controller('api/v1/algoritmoHuffman')
 export class AlgoritmoController {
@@ -17,17 +17,40 @@ export class AlgoritmoController {
         return this.algoritmoService.readFile(file);
     }
 
+
+
+
+
     @Post('readFile2')
     @UseInterceptors(FileInterceptor('file'))
-    uploadFile(@UploadedFile() file: Express.Multer.File) {
-        
+    uploadFile(@UploadedFile() file: File) {
         const typeEncoding:BufferEncoding = "utf-8";
+
+        console.log("This File (Express.Multer.File) : ");
+        console.log(file);
+
+        const newFilePostman = writeFileSync("./src/modules/algoritmo/fileToPostman.txt", "ss");
+            console.log("This New File Postman: ");
+            console.log(newFilePostman);
+
+        const filetxt = readFileSync("./src/modules/algoritmo/file.txt", typeEncoding);
+            console.log("This DataFile: ");
+            console.log(filetxt);
+
+        
+        const newFile = writeFileSync("./src/modules/algoritmo/file1.txt", filetxt);
+            console.log("This New File : ");
+            console.log(newFile);
+
+        return filetxt;
+
+
+        /**
+        
         const options:Object = {
             encoding: typeEncoding,
             flag: "r"
         }
-        
-        /**
         const filetxt = readFile(file.buffer, options, (err, data) => {
             console.log("This File:");
             console.log(file);
@@ -39,11 +62,5 @@ export class AlgoritmoController {
             }
         })
         return file;*/
-        const filetxt = readFileSync("./src/modules/algoritmo/file.txt", "utf-8");
-            console.log("This File: ");
-            console.log(file);
-            console.log("This DataFile: ");
-            console.log(filetxt);
-        return filetxt;
     }
 }
