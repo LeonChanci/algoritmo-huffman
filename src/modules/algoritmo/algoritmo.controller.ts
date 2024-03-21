@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Get, Post, Res, Body, Controller, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { AlgoritmoService } from './algoritmo.service';
 import { ExpressAdapter, FileInterceptor } from '@nestjs/platform-express';
@@ -11,17 +12,13 @@ export class AlgoritmoController {
 
     }
 
-    @Post('readFile1')
+    @Post('encodeFile')
     @UseInterceptors(FileInterceptor('file'))
-    uploadFile1(@UploadedFile() file: Express.Multer.File) {
-        return this.algoritmoService.readFile(file);
+    uploadFile(@UploadedFile() file:Express.Multer.File) {
+        return this.algoritmoService.encodeFile(file);
     }
 
-
-
-
-
-    @Post('readFile2')
+    /*@Post('readFile2')
     @UseInterceptors(FileInterceptor('file'))
     uploadFile(@UploadedFile() file: File) {
         const typeEncoding:BufferEncoding = "utf-8";
@@ -43,7 +40,7 @@ export class AlgoritmoController {
             console.log(newFile);
 
         return filetxt;
-
+        
 
         /**
         
@@ -61,6 +58,6 @@ export class AlgoritmoController {
                 return data;
             }
         })
-        return file;*/
-    }
+        return file;
+    }*/
 }
