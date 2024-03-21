@@ -8,7 +8,7 @@ import { Nodo } from './algoritmo.module';
 @Injectable()
 export class AlgoritmoService {
 
-    encodeFile(file : Express.Multer.File) {
+    encodeFile(file) {
         const pathFiles:string = "./src/modules/algoritmo/filesTxt/";
         const nameFile:string = file.fieldname;
         const dateString:string = new Date().valueOf().toString();
@@ -16,7 +16,8 @@ export class AlgoritmoService {
         
         //Guardar Archivo en el directorio "files"
         writeFileSync(pathFiles.concat(finalName), file.buffer.toString());
-
+        //writeFileSync(pathFiles.concat(finalName), file.bufferut.toString());
+        
         const fileTxt = readFileSync(pathFiles+finalName, "utf-8");
         console.log("---====TEXTO DEL ARCHIVO===---");
         console.log(fileTxt);
