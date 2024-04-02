@@ -13,6 +13,7 @@ export class AlgoritmoController {
     @Post('encodeFile')
     @UseInterceptors(FileInterceptor('file'))
     uploadFile(@UploadedFile() file: Express.Multer.File) {
+        console.log(file);
         return this.algoritmoService.encodeFile(file);
     }
 }

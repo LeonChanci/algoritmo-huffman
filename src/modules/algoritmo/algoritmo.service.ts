@@ -19,36 +19,27 @@ export class AlgoritmoService {
         //writeFileSync(pathFiles.concat(finalName), file.bufferut.toString());
         
         const fileTxt = readFileSync(pathFiles+finalName, "utf-8");
-        console.log("---====TEXTO DEL ARCHIVO===---");
-        console.log(fileTxt);
-        console.log("\n");
+        console.log("---====TEXTO DEL ARCHIVO===---", "\n", fileTxt, "\n");
 
-        console.log("---====TABLA DE FRECUENCIAS===---");
         const frecuencias = this.getFrecuencia(fileTxt);
-        console.log(frecuencias);
-        console.log("\n");
+        console.log("---====TABLA DE FRECUENCIAS===---", "\n", frecuencias, "\n");
 
         const arbol = this.construirArbol(frecuencias);
-        console.log("---====NODO PADRE===---");
-        console.log(arbol);
-        console.log("\n");
+        console.log("---====NODO PADRE===---", "\n", arbol, "\n");
 
         const codigoBinario = this.getCodigoBinario(fileTxt);
-        console.log("---====TABLA CÓDIGO BINARIO===---");
-        console.log(codigoBinario);
-        console.log("\n");
+        console.log("---====TABLA CÓDIGO BINARIO===---", "\n", codigoBinario, "\n");
 
         const textoCodificado = this.codificacionTexto(fileTxt, codigoBinario);
-        console.log("---====TEXTO (CARACTERES) CODIFICADO===---");
-        console.log(textoCodificado);
-        console.log("\n");
+        console.log("---====TEXTO (CARACTERES) CODIFICADO===---", "\n", textoCodificado, "\n");
 
         const textoDecodificado = this.decodificacionTexto(textoCodificado, codigoBinario);
-        console.log("---====TEXTO (CARACTERES) DECODIFICADO===---");
-        console.log(textoDecodificado);
-        console.log("\n");
-                      
-        this.prueba(textoCodificado, codigoBinario);
+        console.log("---====TEXTO (CARACTERES) DECODIFICADO===---", "\n", textoDecodificado, "\n");
+
+        
+
+
+        this.pruebaGuardarBin(textoCodificado, codigoBinario, file);
 
         //let uint8Array = new Uint8Array([72, 111, 108, 97]);
         //console.log( new TextDecoder().decode(uint8Array) ); // Hola
@@ -56,32 +47,40 @@ export class AlgoritmoService {
         return arbol;
     }
 
-    prueba(textoCodificado: Array<string>, codigoBinario: Map<string, string>) {
+    /**
+     * 
+     * @param textoCodificado 
+     * @param codigoBinario 
+     */
+    pruebaGuardarBin(textoCodificado: Array<string>, codigoBinario: Map<string, string>, file) {
         let codigoBinarioConcatenado = "";
         for (let i=0; i < textoCodificado.length; i++) {
             codigoBinarioConcatenado+= textoCodificado[i];  
         }
-        console.log("---====CODIGO CODIFICADO BINARIO UNIDO EN STRING===---");
-        console.log(codigoBinarioConcatenado);
-        console.log("\n");
+        console.log("---====CODIGO CODIFICADO BINARIO UNIDO EN STRING===---", "\n", codigoBinarioConcatenado, "\n");
 
         const typeEncoding:WriteFileOptions = {
             encoding: "ascii"
         }
-
         writeFileSync("./src/modules/algoritmo/filesBin/fileBinario.bin", textoCodificado.toString(), typeEncoding);
-        console.log("---====CODIGO BINARIO POR COMAS EN .bin===---");
-        console.log(textoCodificado.toString());
-        console.log("\n");
+        console.log("---====CODIGO BINARIO POR COMAS EN .bin===---", "\n", textoCodificado.toString(), "\n");
 
         const newFileTexto = readFileSync("./src/modules/algoritmo/filesBin/fileBinario.bin", "utf-8");
         let textoCodificadoBin = newFileTexto.split(",");
 
         const textoDecodificado = this.decodificacionTexto(textoCodificadoBin, codigoBinario);
-        console.log("---====CODIGO DECODIFICADO LEYENDO .bin===---");
-        console.log(textoDecodificado);
-        console.log("\n");
+        console.log("---====CODIGO DECODIFICADO LEYENDO .bin===---", "\n", textoDecodificado, "\n");
         
+
+
+        
+        console.log(file.buffer);
+        const buffer = Buffer.alloc(file.size);
+        buffer.write(file.buffer.toString());
+        console.log(buffer);
+        console.log(file.buffer.toString());
+        writeFileSync("./src/modules/algoritmo/filesBin/fileBinario2.bin", file.buffer, typeEncoding);
+
         /*
         let cadenaCodificada = btoa(stringUnido);
         console.log("Codificacion64:");
