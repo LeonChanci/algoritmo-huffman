@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { readFileSync, writeFileSync } from 'fs';
-import { Nodo, Result } from './algoritmo.module';
+import { Nodo, ResultEncode } from './algoritmo.module';
 
 @Injectable()
 export class AlgoritmoService {
@@ -31,19 +31,22 @@ export class AlgoritmoService {
         const textoFile = readFileSync(pathFiles + finalName, "utf-8");
         
         //Imprimir el proceso del algoritmo en consola
-        const { textoCodificado } = this.imprimirProcesoEnConsola(textoFile, pathFiles, finalName);
+        const { textoCodificado, codigoBinarioConcatenado} = this.imprimirProcesoEnConsola(textoFile, pathFiles, finalName);
         
         //Ejecutar Algoritmo Huffman
-        const resultadoMapa:Map<string, string> = this.ejecutarAlgoritmo(textoFile);
+        const resultadoMapa: Map<string, string> = this.ejecutarAlgoritmo(textoFile);
 
         //Guardar y comprimir el archivo .bin
-        this.crearArchivoBin(textoCodificado);
+        const arhivoBin = this.crearArchivoBin(textoCodificado);
 
-        
-        let result: Result = {
+
+        let result: ResultEncode = {
             mapCodeBinario: resultadoMapa,
             textoFile: textoFile,
-            tamanoFile: tamanoArchivo
+            tamanoFile: tamanoArchivo,
+            pathFileTxt: pathFiles.concat(finalName),
+            pathFileBin: arhivoBin,
+            codigoBinario: codigoBinarioConcatenado
         };
 
         //return resultadoMapa;
@@ -93,7 +96,9 @@ export class AlgoritmoService {
      * Crear archivo .bin con el texto codificado 
      * @param textoCodificado 
      */
-    crearArchivoBin(textoCodificado: Array<string>) {
+    crearArchivoBin(textoCodificado: Array<string>): string {
+        const pathFiles: string = "./src/modules/algoritmo/filesBin/";
+        const nameFile: string = "fileBinario.bin"
         //Se une todo el código binario en una variable
         let codigoBinarioConcatenado = "";
         for (let i=0; i < textoCodificado.length; i++) {
@@ -105,7 +110,9 @@ export class AlgoritmoService {
         console.log("---====CÓDIGO BINARIO COMPRIMIDO===---", "\n", codeBin, "\n");
 
         //Crea archivo .bin en el directorio "filesBin"
-        writeFileSync("./src/modules/algoritmo/filesBin/fileBinario.bin", codeBin, "utf-8");
+        writeFileSync(pathFiles.concat(nameFile), codeBin, "utf-8");
+
+        return pathFiles.concat(nameFile);
     }
 
     //Pasar texto a un array tipo int de 8bit para comprimir el código binario
@@ -321,6 +328,6 @@ export class AlgoritmoService {
         }
         console.log("---====CÓDIGO CODIFICADO BINARIO UNIDO EN STRING SIN COMPRIMIR===---", "\n", codigoBinarioConcatenado, "\n");
 
-        return { textoCodificado, codigoBinario, arbol };
+        return { textoCodificado, codigoBinario, arbol, codigoBinarioConcatenado};
     }
 }

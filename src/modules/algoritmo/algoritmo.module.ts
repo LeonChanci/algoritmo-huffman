@@ -18,9 +18,12 @@ export interface Nodo {
   derecha: Nodo | null;
 }
 
-export type Result = {
+export type ResultEncode = {
   mapCodeBinario: Map<string, string>,
   textoFile: string,
   tamanoFile: string
+  pathFileTxt: string,
+  pathFileBin: string,
+  codigoBinario: string,
   mapArray?: [string, string][]
 }

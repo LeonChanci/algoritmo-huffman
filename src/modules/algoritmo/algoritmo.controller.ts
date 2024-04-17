@@ -2,7 +2,7 @@
 import { Post, Controller, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { AlgoritmoService } from './algoritmo.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Result } from './algoritmo.module';
+import { ResultEncode } from './algoritmo.module';
 
 @Controller('api/v1/algoritmoHuffman')
 export class AlgoritmoController {
@@ -18,7 +18,7 @@ export class AlgoritmoController {
         console.log(fileTxt);
         //const resultado: Map<string, string> = this.algoritmoService.encodeFile(fileTxt);
 
-        const resultado: Result =  this.algoritmoService.encodeFile(fileTxt);
+        const resultado: ResultEncode =  this.algoritmoService.encodeFile(fileTxt);
 
         //Se guarda el código binario globalmente
         this.codigoBinario = resultado.mapCodeBinario;
