@@ -17,3 +17,10 @@ export interface Nodo {
   izquierda: Nodo | null;
   derecha: Nodo | null;
 }
+
+export type Result = {
+  mapCodeBinario: Map<string, string>,
+  textoFile: string,
+  tamanoFile: string
+  mapArray?: [string, string][]
+}

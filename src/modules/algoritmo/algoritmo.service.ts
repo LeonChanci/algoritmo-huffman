@@ -2,18 +2,28 @@
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
-import { WriteFileOptions, readFileSync, writeFileSync } from 'fs';
-import { Nodo } from './algoritmo.module';
+import { readFileSync, writeFileSync } from 'fs';
+import { Nodo, Result } from './algoritmo.module';
 
 @Injectable()
 export class AlgoritmoService {
 
+    /**
+     * Codificar el texto con el algoritmo Huffman y guardarlo en un archivo .bin
+     * @param fileTxt File
+     * @returns resultadoMapa Map<string, string>
+     */
     encodeFile(fileTxt) {
-        const pathFiles:string = "./src/modules/algoritmo/filesTxt/";
-        const nameFile:string = fileTxt.fieldname;
-        const dateString:string = new Date().valueOf().toString();
+        //Obtener el nombre de los archivos a guardar
+        const pathFiles: string = "./src/modules/algoritmo/filesTxt/";
+        const nameFile: string = fileTxt.fieldname;
+        const dateString: string = new Date().valueOf().toString();
         let finalName = new String(nameFile).concat("_", dateString, ".txt").toString();
         
+        //Tamaño del archivo
+        let tamanoArchivo = new String(fileTxt.size).concat(" bytes");
+        console.log(tamanoArchivo);
+
         //Guardar Archivo en el directorio "filesTxt"
         writeFileSync(pathFiles.concat(finalName), fileTxt.buffer.toString());
         
@@ -21,120 +31,118 @@ export class AlgoritmoService {
         const textoFile = readFileSync(pathFiles + finalName, "utf-8");
         
         //Imprimir el proceso del algoritmo en consola
-        const { textoCodificado, codigoBinario, arbol } = this.imprimirProcesoEnConsola(textoFile, pathFiles, finalName);
+        const { textoCodificado } = this.imprimirProcesoEnConsola(textoFile, pathFiles, finalName);
+        
+        //Ejecutar Algoritmo Huffman
         const resultadoMapa:Map<string, string> = this.ejecutarAlgoritmo(textoFile);
 
-        //Prueba para guardar y comrprimir el archivo .bin
-        this.pruebaGuardarBin(textoCodificado, codigoBinario, fileTxt);
-        return resultadoMapa;
-    }
+        //Guardar y comprimir el archivo .bin
+        this.crearArchivoBin(textoCodificado);
 
-    decodeFile(fileBin, codigoBinario: Map<string, string>): string {
+        
+        let result: Result = {
+            mapCodeBinario: resultadoMapa,
+            textoFile: textoFile,
+            tamanoFile: tamanoArchivo
+        };
 
-        const fileBn = fileBin.buffer;
-        console.log(fileBn);
-
-        const arrayBuffer2 = fileBin.buffer as ArrayBuffer;
-        let binaryContent: string;
-            
-        // Convierte el ArrayBuffer a una cadena binaria
-        const binaryArray = new Uint8Array(arrayBuffer2);
-        binaryContent = Array.from(binaryArray)
-          .map((byte) => byte.toString(2).padStart(8, '0'))
-          .join('');        
-
-        const compressedText = "11101111000110001010110011100101";
-
-        let decompressedText = '';
-        let currentCode = '';
-        // recorre cada bit del texto comprimido
-        for (const bit of compressedText) {
-          // agrega el bit al código actual
-          currentCode += bit;
-          // busca el código actual en la tabla de códigos
-          if (codigoBinario.get(currentCode)) {
-            // si se encontró el código, agrega el carácter correspondiente al texto descomprimido
-            decompressedText += codigoBinario.get(currentCode)!;
-            // reinicia el código actual
-            currentCode = '';
-          }
-        }
-    
-        // retorna el texto descomprimido
-        return decompressedText;
+        //return resultadoMapa;
+        return result;
     }
 
     /**
-     * 
-     * @param textoCodificado 
-     * @param codigoBinario 
+     * Decódificar el texto recibiendo archivo .bin
+     * @param fileBin File .bin
+     * @param codigoBinario  Map<string, string>
+     * @returns 
      */
-    pruebaGuardarBin(textoCodificado: Array<string>, codigoBinario: Map<string, string>, file) {
+    decodeFile(fileBin, codigoBinario: Map<string, string>): string {
+        const fileBn = fileBin.buffer;
+        console.log(fileBn);
 
-        console.log("\n", "\n", "\n", "\n", "---====PRUEBAS===---", "\n", "\n", "\n", "\n", );
+        const arrayBuffer = fileBin.buffer as ArrayBuffer;
+            
+        //Convierte el ArrayBuffer a una cadena binaria
+        const binarioArray = new Uint8Array(arrayBuffer);
+        let binaryContent = Array.from(binarioArray)
+          .map((byte) => byte.toString(2).padStart(8, '0'))
+          .join('');
+        
+        //const binaryContent = "11101111000110001010110011100101";
 
+        let textoDescomprimido = '';
+        let codigoActual = '';
+        //Recorre cada bit del texto comprimido
+        for (const bit of binaryContent) {
+          //Agrega el bit al código actual
+          codigoActual += bit;
+          //Busca el código actual en la tabla de códigos
+          if (codigoBinario.get(codigoActual)) {
+            //Si se encontró el código, agrega el carácter correspondiente al texto descomprimido
+            textoDescomprimido += codigoBinario.get(codigoActual)!;
+            //Reinicia el código actual
+            codigoActual = '';
+          }
+        }
+    
+        //Retorna el texto descomprimido
+        return textoDescomprimido;
+    }
+
+    /**
+     * Crear archivo .bin con el texto codificado 
+     * @param textoCodificado 
+     */
+    crearArchivoBin(textoCodificado: Array<string>) {
+        //Se une todo el código binario en una variable
         let codigoBinarioConcatenado = "";
         for (let i=0; i < textoCodificado.length; i++) {
             codigoBinarioConcatenado+= textoCodificado[i];  
         }
- 
+        
+        //Obtener código binario en 8Array
         const codeBin = this.textToUint8Array(codigoBinarioConcatenado);
+        console.log("---====CÓDIGO BINARIO COMPRIMIDO===---", "\n", codeBin, "\n");
+
+        //Crea archivo .bin en el directorio "filesBin"
         writeFileSync("./src/modules/algoritmo/filesBin/fileBinario.bin", codeBin, "utf-8");
-        console.log("---====.bin===---", "\n", codeBin, "\n");
-
-        /*
-        const typeEncoding:WriteFileOptions = {
-            encoding: "ascii"
-        }
-        writeFileSync("./src/modules/algoritmo/filesBin/fileBinario.bin", textoCodificado.toString(), typeEncoding);
-        console.log("---====CODIGO BINARIO POR COMAS EN .bin===---", "\n", textoCodificado.toString(), "\n");
-
-        const newFileTexto = readFileSync("./src/modules/algoritmo/filesBin/fileBinario.bin", "utf-8");
-        let textoCodificadoBin = newFileTexto.split(",");
-
-        const textoDecodificado = this.decodificacionTexto(textoCodificadoBin, codigoBinario);
-        console.log("---====CODIGO DECODIFICADO LEYENDO .bin===---", "\n", textoDecodificado, "\n");
- 
- 
-        console.log(file.buffer);
-        const buffer = Buffer.alloc(file.size);
-        buffer.write(file.buffer.toString());
-        console.log(buffer);
-        console.log(file.buffer.toString());
-        writeFileSync("./src/modules/algoritmo/filesBin/fileBinario2.bin", file.buffer, typeEncoding);
-        */
-
     }
 
+    //Pasar texto a un array tipo int de 8bit para comprimir el código binario
     textToUint8Array(text: string): Uint8Array {
+        //Los Uint8Array representan un array de enteros sin signo de 8 bits
+
+        //Obtenemos el tamaño del texto y se divide en 8 para poder guardarlos en el Uint8Array
         const binaryArray = new Uint8Array(text.length / 8);
         for (let i = 0; i < text.length; i += 8) {
-          const byte = text.substr(i, 8);
-          binaryArray[i / 8] = parseInt(byte, 2);
+            
+            //Sacamos byte por byte desde la posición 0 a la 8
+            const byte = text.substr(i, 8);
+            binaryArray[i / 8] = parseInt(byte, 2);
         }
         return binaryArray;
     }
 
     /**
-     * Ejecuta el algoritmo
+     * Ejecuta el Algoritmo Huffman
      * @param texto 
      * @returns 
      */
     ejecutarAlgoritmo(texto: string): Map<string, string> {
         const codigoBinario: Map<string, string> = this.getCodigoBinario(texto);
-        //const textoCodificadoArray: Array<string> = this.codificacionTexto(texto, codigoBinario);
-        //const textoDecodificado: string = this.decodificacionTexto(textoCodificadoArray, codigoBinario);
-        
+
+        //Se obtiene el código binario invertido para luego identificar el código por letra
         const codigoBinarioInvertido:Map<string, string> = this.invertMap(codigoBinario);
         return codigoBinarioInvertido;
     }
 
-    invertMap(originalMap: Map<string, string>): Map<string, string> {
-        const invertedMap = new Map<string, string>();
-        originalMap.forEach((value, key) => {
-          invertedMap.set(value, key);
+    //Se invierte el mapa para identificar el código por letra
+    invertMap(mapaOriginal: Map<string, string>): Map<string, string> {
+        const mapaInvertido = new Map<string, string>();
+        mapaOriginal.forEach((value, key) => {
+            mapaInvertido.set(value, key);
         });
-        return invertedMap;
+        return mapaInvertido;
     }
     
     /**
@@ -143,7 +151,6 @@ export class AlgoritmoService {
      * @returns codes Mapa
      */
     getCodigoBinario(texto: string): Map<string, string> {
-        
         //Obtener el array de las frecuencias
         const frecuenciasArray: [string, number][] = this.getFrecuencia(texto);
 
@@ -151,6 +158,7 @@ export class AlgoritmoService {
         const arbolHuffman: Nodo = this.construirArbol(frecuenciasArray);
     
         const codigoBinario: Map<string, string> = new Map();
+
         //Obtener código binario
         this.getCodigos(arbolHuffman, (caracter, codigo) => {
 
@@ -172,13 +180,11 @@ export class AlgoritmoService {
 
         //Se recorre cada caracter del texto
         for (const caracter of texto) {
-
             //Lleva la suma de las frecuencias cuando encuentra un caracter igual
             const contador = frecuenciasMap.get(caracter);
             frecuenciasMap.set(caracter, contador ? contador + 1 : 1);
         }
-
-        //Retorna un arreglo ordenando de manera descendente
+        //Retorna un arreglo ordenando de manera descendente (Mayor frecuencia a menor frecuencia)
         return Array.from(frecuenciasMap).sort((a, b) => b[1] - a[1]);
     }
 
@@ -223,7 +229,7 @@ export class AlgoritmoService {
     }
 
     /**
-     * Obtiene los códigos
+     * Obtiene los códigos resultantes pasando por cada nodo
      * @param arbol 
      * @param codigoBinario 
      * @param codigo 
@@ -313,8 +319,7 @@ export class AlgoritmoService {
         for (let i=0; i < textoCodificado.length; i++) {
             codigoBinarioConcatenado+= textoCodificado[i];  
         }
-        console.log("---====CÓDIGO CODIFICADO BINARIO UNIDO EN STRING===---", "\n", codigoBinarioConcatenado, "\n");
-
+        console.log("---====CÓDIGO CODIFICADO BINARIO UNIDO EN STRING SIN COMPRIMIR===---", "\n", codigoBinarioConcatenado, "\n");
 
         return { textoCodificado, codigoBinario, arbol };
     }
