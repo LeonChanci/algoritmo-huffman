@@ -36,8 +36,11 @@ export class AlgoritmoController {
     @Post('decodeFile')
     @UseInterceptors(FileInterceptor('file'))
     uploadFileBin(@UploadedFile() fileBin: Express.Multer.File) {
-        console.log(fileBin);
         const resultado: string = this.algoritmoService.decodeFile(fileBin, this.codigoBinario);
         return resultado;
+
+        //const resultado: ResultDecode = this.algoritmoService.decodeFile(fileBin, this.codigoBinario);
+        //const jsonResult = JSON.stringify(resultado);
+        //return jsonResult;
     }
 }

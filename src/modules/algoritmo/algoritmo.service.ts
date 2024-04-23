@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { readFileSync, writeFileSync } from 'fs';
-import { Nodo, ResultEncode } from './algoritmo.module';
+import { Nodo, ResultEncode, ResultDecode } from './algoritmo.module';
 
 @Injectable()
 export class AlgoritmoService {
@@ -61,8 +61,8 @@ export class AlgoritmoService {
      */
     decodeFile(fileBin, codigoBinario: Map<string, string>): string {
         const fileBn = fileBin.buffer;
-        console.log(fileBn);
-
+        console.log(fileBin);
+        
         const arrayBuffer = fileBin.buffer as ArrayBuffer;
             
         //Convierte el ArrayBuffer a una cadena binaria
@@ -70,8 +70,6 @@ export class AlgoritmoService {
         let binaryContent = Array.from(binarioArray)
           .map((byte) => byte.toString(2).padStart(8, '0'))
           .join('');
-        
-        //const binaryContent = "11101111000110001010110011100101";
 
         let textoDescomprimido = '';
         let codigoActual = '';
@@ -87,8 +85,17 @@ export class AlgoritmoService {
             codigoActual = '';
           }
         }
-    
+        
+        let tamanoArchivo = new String(fileBin.size).concat(" bytes");
+        console.log(tamanoArchivo);
+
+        let result: ResultDecode = {
+            textoFile: textoDescomprimido,
+            tamanoFile: tamanoArchivo
+        };
+
         //Retorna el texto descomprimido
+        //return result;
         return textoDescomprimido;
     }
 

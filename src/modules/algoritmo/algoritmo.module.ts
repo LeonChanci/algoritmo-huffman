@@ -27,3 +27,8 @@ export type ResultEncode = {
   codigoBinario: string,
   mapArray?: [string, string][]
 }
+
+export type ResultDecode = {
+  textoFile: string,
+  tamanoFile: string
+}
