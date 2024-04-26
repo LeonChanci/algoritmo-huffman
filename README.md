@@ -26,10 +26,21 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+
+## Consider
+
+Have the JavaScript runtime environment - Node.js
+[Link de descarga:](https://nodejs.org/en/download)
+
+
 ## Installation
 
 ```bash
 $ npm install
+```
+
+```bash
+$ npm dedupe
 ```
 
 ## Running the app
