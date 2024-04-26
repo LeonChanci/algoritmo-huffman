@@ -67,12 +67,13 @@ export class AlgoritmoService {
         let binaryContent = Array.from(binarioArray)
           .map((byte) => byte.toString(2).padStart(8, '0'))
           .join('');
-
+          
+        console.log("================================================= 2", binaryContent)
         let textoDescomprimido = '';
         let codigoActual = '';
-        //Recorre cada bit del texto comprimido
+        //Recorre cada bit del texto comprimido (Código binario)
         for (const bit of binaryContent) {
-          //Agrega el bit al código actual
+          //Va tomando cada bit del código binario (Formando el código del carácter)
           codigoActual += bit;
           //Busca el código actual en la tabla de códigos
           if (codigoBinario.get(codigoActual)) {
@@ -119,17 +120,24 @@ export class AlgoritmoService {
         return pathFiles.concat(nameFile);
     }
 
-    //Pasar texto a un array tipo int de 8bit para comprimir el código binario
-    textToUint8Array(text: string): Uint8Array {
+
+    /**
+     * Pasar el codigo Binario a un array tipo int de 8bit
+     * @param codigoBinario 
+     * @returns binaryArray
+     */
+    textToUint8Array(codigoBinario: string): Uint8Array {
         //Los Uint8Array representan un array de enteros sin signo de 8 bits
 
-        //Obtenemos el tamaño del texto y se divide en 8 para poder guardarlos en el Uint8Array
-        const binaryArray = new Uint8Array(text.length / 8);
-        for (let i = 0; i < text.length; i += 8) {
+        //Obtenemos el tamaño del codigoBinario y se divide en 8 para poder guardarlos en el Uint8Array
+        const binaryArray = new Uint8Array(codigoBinario.length / 8);
+        for (let i = 0; i < codigoBinario.length; i += 8) {
             
-            //Sacamos byte por byte desde la posición 0 a la 8
-            const byte = text.substr(i, 8);
-            binaryArray[i / 8] = parseInt(byte, 2);
+            //Sacamos los bytes de 8 en 8
+            const byte = codigoBinario.substr(i, 8);
+            
+            //Guardamos en cada posición del array los bytes en base 2 (Binario)
+            binaryArray[i/8] = parseInt(byte, 2);
         }
         return binaryArray;
     }
