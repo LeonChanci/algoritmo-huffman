@@ -59,10 +59,7 @@ export class AlgoritmoService {
      * @param codigoBinario  Map<string, string>
      * @returns 
      */
-    decodeFile(fileBin, codigoBinario: Map<string, string>): string {
-        const fileBn = fileBin.buffer;
-        console.log(fileBin);
-        
+    decodeFile(fileBin, codigoBinario: Map<string, string>): string {        
         const arrayBuffer = fileBin.buffer as ArrayBuffer;
             
         //Convierte el ArrayBuffer a una cadena binaria
