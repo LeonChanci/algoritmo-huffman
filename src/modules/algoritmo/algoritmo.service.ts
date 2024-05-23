@@ -68,7 +68,7 @@ export class AlgoritmoService {
           .map((byte) => byte.toString(2).padStart(8, '0'))
           .join('');
           
-        console.log("================================================= 2", binaryContent)
+        //console.log("================================================= 2", binaryContent)
         let textoDescomprimido = '';
         let codigoActual = '';
         //Recorre cada bit del texto comprimido (Código binario)
